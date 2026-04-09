@@ -1,0 +1,47 @@
+{
+  "entities": {
+    "Order": {
+      "title": "Pedido",
+      "description": "Información detallada de un pedido realizado por un cliente.",
+      "type": "object",
+      "properties": {
+        "nombre": { "type": "string", "description": "Nombre completo del cliente" },
+        "cedula": { "type": "string", "description": "Cédula de ciudadanía" },
+        "celular": { "type": "string", "description": "Número de celular" },
+        "correo": { "type": "string", "description": "Correo electrónico" },
+        "cuotas": { "type": "number", "description": "Número de cuotas de financiación" },
+        "archivoUrl": { "type": "string", "description": "URL del archivo adjunto en Storage" },
+        "entregaTipo": { "type": "string", "enum": ["sede", "domicilio"] },
+        "sede": { "type": "string" },
+        "ciudad": { "type": "string" },
+        "direccion": { "type": "string" },
+        "barrio": { "type": "string" },
+        "localidad": { "type": "string" },
+        "productos": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "number" },
+              "name": { "type": "string" },
+              "price": { "type": "number" },
+              "quantity": { "type": "number" }
+            }
+          }
+        },
+        "subtotal": { "type": "number" },
+        "costoEnvio": { "type": "number" },
+        "total": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "uid": { "type": "string", "description": "ID del usuario que realizó el pedido" }
+      },
+      "required": ["nombre", "cedula", "celular", "correo", "productos", "total", "uid", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Colección de pedidos realizados"
+    }
+  }
+}
