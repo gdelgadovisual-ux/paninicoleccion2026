@@ -9,7 +9,7 @@ dotenv.config();
 
 async function startServer() {
   const app = express();
-  const PORT = process.env.PORT || 3000;
+  const PORT = Number(process.env.PORT) || 3000;
 
   // Middleware para logs de peticiones
   app.use((req, res, next) => {
@@ -64,6 +64,7 @@ async function startServer() {
 
   // API: Endpoint para enviar pedido por correo
   app.post('/api/send-order', (req, res, next) => {
+    console.log(`[Server] Recibida petición POST en /api/send-order`);
     upload.single('archivo')(req, res, (err) => {
       if (err instanceof multer.MulterError) {
         console.error('[Server] Multer Error:', err);
@@ -72,17 +73,19 @@ async function startServer() {
         console.error('[Server] Unknown Upload Error:', err);
         return res.status(500).json({ error: 'Error desconocido al procesar el archivo', details: err.message });
       }
+      console.log(`[Server] Archivo procesado por Multer: ${req.file ? req.file.originalname : 'Ninguno'}`);
       next();
     });
   }, async (req: any, res: any) => {
     try {
       if (!req.body.orderData) {
+        console.error('[Server] Error: Faltan los datos del pedido (orderData)');
         return res.status(400).json({ error: 'Faltan los datos del pedido (orderData)' });
       }
       const orderData = JSON.parse(req.body.orderData);
       const { nombre, cedula, celular, correo, total, productos, entregaTipo, sede, ciudad, direccion, barrio, localidad, cuotas } = orderData;
 
-      console.log(`[Server] Iniciando envío de pedido para: ${nombre} <${correo}>`);
+      console.log(`[Server] Procesando pedido para: ${nombre} <${correo}>`);
 
       const productListHtml = productos.map((p: any) => 
         `<li style="margin-bottom: 8px;">
@@ -199,10 +202,25 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
+    
+    // Servir index.html para cualquier ruta que no sea API
     app.get('*', (req, res) => {
+      if (req.url.startsWith('/api/')) {
+        return res.status(404).json({ error: 'Ruta de API no encontrada (GET)' });
+      }
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
+
+  // Manejador final para cualquier otro método (POST, etc) en rutas no encontradas
+  app.all('*', (req, res) => {
+    res.status(404).json({ 
+      error: 'Ruta no encontrada', 
+      method: req.method, 
+      url: req.url,
+      isApi: req.url.startsWith('/api/')
+    });
+  });
 
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running on http://0.0.0.0:${PORT}`);

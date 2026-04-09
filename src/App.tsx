@@ -801,7 +801,9 @@ export default function App() {
                       } else {
                         const text = await response.text();
                         console.error("Respuesta no JSON del servidor:", text);
-                        throw new Error(`El servidor respondió con un formato inesperado (HTML/Texto). Esto suele indicar un error 404 o 500 en el servidor.`);
+                        // Mostramos los primeros 100 caracteres para ayudar al diagnóstico
+                        const snippet = text.substring(0, 100).replace(/</g, '&lt;');
+                        throw new Error(`El servidor respondió con un formato inesperado (HTML/Texto). Snippet: ${snippet}...`);
                       }
 
                       if (!response.ok) {
