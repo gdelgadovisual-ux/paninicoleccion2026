@@ -29,7 +29,7 @@ async function startServer() {
 
   // Configuración de Nodemailer - La forma más simple y estándar
   const emailUser = 'segurosfoncorp@gmail.com';
-  const emailPass = 'xioaycxdutqpzfeu'; // ASEGÚRATE DE QUE ESTA SEA LA NUEVA CLAVE DE 16 CARACTERES
+  const emailPass = 'kzbjdruuwmnocvfk'; // ASEGÚRATE DE QUE ESTA SEA LA NUEVA CLAVE DE 16 CARACTERES
   const receiverEmail = (process.env.RECEIVER_EMAIL || emailUser).trim();
 
   const transporter = nodemailer.createTransport({
